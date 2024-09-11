@@ -1,5 +1,6 @@
 package com.azrinurvani.imagevista.presentation.full_image_screen
 
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -13,6 +14,8 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -27,30 +30,37 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import com.azrinurvani.imagevista.R
 import com.azrinurvani.imagevista.domain.model.UnsplashImage
+import com.azrinurvani.imagevista.presentation.component.DownloadOptionsBottomSheet
 import com.azrinurvani.imagevista.presentation.component.FullImageViewTopBar
+import com.azrinurvani.imagevista.presentation.component.ImageDownloadOption
 import com.azrinurvani.imagevista.presentation.component.ImageVistaLoadingBar
 import com.azrinurvani.imagevista.presentation.util.rememberWindowInsetsController
 import com.azrinurvani.imagevista.presentation.util.toggleStatusBars
 import kotlinx.coroutines.launch
 import kotlin.math.max
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun FullImageScreen(
     image : UnsplashImage?,
     onBackClick : () -> Unit,
-    onPhotographerImageClick : (String) -> Unit,
+    onPhotographerNameClick : (String) -> Unit,
+    onImageDownloadClick : (String,String?) -> Unit
 ){
-
+    val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var showBars by rememberSaveable { mutableStateOf(false) }
     val windowInsetsController = rememberWindowInsetsController()
+
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var isDownloadBottomSheetOpen by remember{ mutableStateOf(false) }
 
     //Triggered only for the first time use LaunchedEffect
     LaunchedEffect(key1 = Unit) { //use Unit not change the value after initial trigger
@@ -61,6 +71,30 @@ fun FullImageScreen(
         windowInsetsController.toggleStatusBars(show = true)
         onBackClick()
     }
+
+    DownloadOptionsBottomSheet(
+        isOpen = isDownloadBottomSheetOpen,
+        sheetState = sheetState,
+        onDismissRequest = { isDownloadBottomSheetOpen = false },
+        onOptionClick = { option ->
+            scope.launch {
+                sheetState.hide() //whenever user click option button Bottom Sheet must be close
+            }.invokeOnCompletion {
+                //checking after bottom sheet hiden
+                if (!sheetState.isVisible) isDownloadBottomSheetOpen = false
+            }
+            val url = when( option ){
+                ImageDownloadOption.SMALL -> image?.imageUrlSmall
+                ImageDownloadOption.MEDIUM -> image?.imageUrlRegular
+                ImageDownloadOption.ORIGINAL -> image?.imageUrlRaw
+            }
+
+            url?.let{
+                onImageDownloadClick(it,image?.description?.take(20)) //only 20 character
+                Toast.makeText(context,"Downloading...",Toast.LENGTH_LONG).show()
+            }
+        }
+    )
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -140,8 +174,8 @@ fun FullImageScreen(
             image = image,
             isVisible = showBars,
             onBackClick = onBackClick,
-            onPhotographerImageClick = onPhotographerImageClick,
-            onDownloadImageClick = {}
+            onPhotographerNameClick = onPhotographerNameClick,
+            onDownloadImageClick = { isDownloadBottomSheetOpen = true }
         )
     }
 

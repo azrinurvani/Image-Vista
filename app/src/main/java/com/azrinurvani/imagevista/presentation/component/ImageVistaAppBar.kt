@@ -88,7 +88,7 @@ fun FullImageViewTopBar(
     image: UnsplashImage?,
     isVisible : Boolean,
     onBackClick : () -> Unit,
-    onPhotographerImageClick : (String) -> Unit,
+    onPhotographerNameClick : (String) -> Unit,
     onDownloadImageClick : () -> Unit,
 ){
 
@@ -120,7 +120,7 @@ fun FullImageViewTopBar(
             Column(
                 modifier = Modifier.clickable {
                     image?.let {
-                        onPhotographerImageClick(it.photographerProfileImageUrl)
+                        onPhotographerNameClick(it.photographerProfileLink)
                     }
                 }
             ) {

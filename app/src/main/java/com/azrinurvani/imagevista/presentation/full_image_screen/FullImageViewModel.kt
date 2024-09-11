@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.azrinurvani.imagevista.domain.model.UnsplashImage
+import com.azrinurvani.imagevista.domain.repository.Downloader
 import com.azrinurvani.imagevista.domain.repository.ImageRepository
 import com.azrinurvani.imagevista.presentation.navigation.Routes
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,6 +18,7 @@ import javax.inject.Inject
 @HiltViewModel
 class FullImageViewModel @Inject constructor(
     private val repository: ImageRepository,
+    private val downloader : Downloader,
     savedStateHandle: SavedStateHandle //to keep arguments
 ) : ViewModel() {
 
@@ -36,6 +38,16 @@ class FullImageViewModel @Inject constructor(
                 val result = repository.getImage(imageId)
                 image = result
             }catch (e: Exception){
+                e.printStackTrace()
+            }
+        }
+    }
+
+    fun downloadImage(url : String, title : String?){
+        viewModelScope.launch {
+            try {
+                downloader.downloadFile(url,title)
+            }catch (e : Exception){
                 e.printStackTrace()
             }
         }
