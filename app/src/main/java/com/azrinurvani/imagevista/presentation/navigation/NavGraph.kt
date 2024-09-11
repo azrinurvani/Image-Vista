@@ -7,9 +7,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.toRoute
 import com.azrinurvani.imagevista.presentation.favourite.FavouriteScreen
 import com.azrinurvani.imagevista.presentation.full_image_screen.FullImageScreen
+import com.azrinurvani.imagevista.presentation.full_image_screen.FullImageViewModel
 import com.azrinurvani.imagevista.presentation.home_sreen.HomeScreen
 import com.azrinurvani.imagevista.presentation.home_sreen.HomeViewModel
 import com.azrinurvani.imagevista.presentation.search_screen.SearchScreen
@@ -47,11 +47,13 @@ fun NavGraphSetup(
                 onBackClick = { navController.navigateUp() }
             )
         }
-        composable<Routes.FullImageScreen> { backStageEntry ->
-            val imageId = backStageEntry.toRoute<Routes.FullImageScreen>().imageId
+        composable<Routes.FullImageScreen> {
+//            val fullImageViewModel = hiltViewModel<FullImageViewModel>()
+            val fullImageViewModel : FullImageViewModel = hiltViewModel()
             FullImageScreen(
-                imageId = imageId,
-                onBackClick = { navController.navigateUp() }
+                image = fullImageViewModel.image,
+                onBackClick = { navController.navigateUp() },
+                onPhotographerImageClick = {}
             )
         }
         composable<Routes.ProfileScreen> {
