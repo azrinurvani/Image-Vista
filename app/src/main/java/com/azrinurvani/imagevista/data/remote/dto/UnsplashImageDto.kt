@@ -19,14 +19,14 @@ data class UnsplashImageDto(
     val width: Int = 0,
 
     @SerialName("urls")
-    val urls: Urls? = Urls(),
+    val urls: UrlsDto? = UrlsDto(),
 
     @SerialName("user")
     val user: UserDto? = UserDto()
 )
 
 @Serializable
-data class Urls(
+data class UrlsDto(
     @SerialName("full")
     val full: String = "",
 

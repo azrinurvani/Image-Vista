@@ -16,6 +16,7 @@ import com.azrinurvani.imagevista.presentation.home_sreen.HomeScreen
 import com.azrinurvani.imagevista.presentation.home_sreen.HomeViewModel
 import com.azrinurvani.imagevista.presentation.profile.ProfileScreen
 import com.azrinurvani.imagevista.presentation.search_screen.SearchScreen
+import com.azrinurvani.imagevista.presentation.search_screen.SearchViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,9 +45,16 @@ fun NavGraphSetup(
             )
         }
         composable<Routes.SearchScreen> {
+            val searchViewModel : SearchViewModel = hiltViewModel()
             SearchScreen(
-                onBackClick = { navController.navigateUp() }
+                snackBarHostState = snackbarHostState,
+                snackBarEvent = searchViewModel.snackBarEvent,
+                onBackClick = { navController.navigateUp() },
+                onImageClick = { imageId ->
+                    navController.navigate(Routes.FullImageScreen(imageId))
+                }
             )
+
         }
         composable<Routes.FavouriteScreen> {
             FavouriteScreen(
