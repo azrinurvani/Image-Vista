@@ -22,7 +22,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.azrinurvani.imagevista.R
 import com.azrinurvani.imagevista.domain.model.UnsplashImage
-import com.azrinurvani.imagevista.presentation.component.ImageVerticalGrid
 import com.azrinurvani.imagevista.presentation.component.ImageVistaTopAppBar
 import com.azrinurvani.imagevista.presentation.component.ZoomedImageCard
 import com.azrinurvani.imagevista.presentation.util.SnackBarEvent
@@ -61,15 +60,16 @@ fun HomeScreen(
                 onSearchClick = onSearchClick,
                 scrollBehavior = scrollBehavior
             )
-            ImageVerticalGrid(
-                images = images,
-                onImageClick = onImageClick,
-                onImageDragStart = { image ->
-                    activeImage = image
-                    showImagePreview = true
-                },
-                onImageDragEnd = { showImagePreview = false }
-            )
+
+//            ImageVerticalGrid(
+//                images = images,
+//                onImageClick = onImageClick,
+//                onImageDragStart = { image ->
+//                    activeImage = image
+//                    showImagePreview = true
+//                },
+//                onImageDragEnd = { showImagePreview = false }
+//            )
         }
         FloatingActionButton(
             modifier = Modifier

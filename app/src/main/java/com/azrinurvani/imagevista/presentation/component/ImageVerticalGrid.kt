@@ -6,30 +6,31 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
-import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
+import androidx.paging.compose.LazyPagingItems
 import com.azrinurvani.imagevista.domain.model.UnsplashImage
 
 @Composable
 fun ImageVerticalGrid(
     modifier: Modifier = Modifier,
-    images : List<UnsplashImage?>,
+    images : LazyPagingItems<UnsplashImage>,
     onImageClick : (String) -> Unit,
     onImageDragStart : (UnsplashImage?) -> Unit,
     onImageDragEnd : () -> Unit,
 ){
     LazyVerticalStaggeredGrid(
         modifier = modifier,
-        columns = StaggeredGridCells.Adaptive(120.dp),
+        columns = StaggeredGridCells.Adaptive(180.dp),
         contentPadding = PaddingValues(10.dp),
         verticalItemSpacing = 10.dp,
         horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
 
-        items(images){ image->
+        items(count = images.itemCount){ index ->
+            val image = images[index]
             ImageCard(
                 image = image,
                 modifier = Modifier
@@ -44,6 +45,25 @@ fun ImageVerticalGrid(
                         )
                     }
             )
+
         }
+
+        //using List<UnsplashImage> not LazyPagingItems<UnsplashImage>
+//        items(images){ image->
+//            ImageCard(
+//                image = image,
+//                modifier = Modifier
+//                    .clickable { image?.id?.let { onImageClick(it) } }
+//                    .pointerInput(Unit){
+//                        //for gesture listener from user
+//                        detectDragGesturesAfterLongPress(
+//                            onDragStart = { onImageDragStart(image)},
+//                            onDragCancel = { onImageDragEnd() },
+//                            onDragEnd = { onImageDragEnd() },
+//                            onDrag = { _ , _ ->}
+//                        )
+//                    }
+//            )
+//        }
     }
 }

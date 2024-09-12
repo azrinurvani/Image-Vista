@@ -1,5 +1,6 @@
 package com.azrinurvani.imagevista.presentation.search_screen
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,6 +36,8 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
+import androidx.paging.compose.LazyPagingItems
+import com.azrinurvani.imagevista.data.util.Constants
 import com.azrinurvani.imagevista.domain.model.UnsplashImage
 import com.azrinurvani.imagevista.presentation.component.ImageVerticalGrid
 import com.azrinurvani.imagevista.presentation.component.ZoomedImageCard
@@ -47,8 +50,12 @@ import kotlinx.coroutines.flow.Flow
 @Composable
 fun SearchScreen(
     snackBarHostState : SnackbarHostState,
+    searchImages : LazyPagingItems<UnsplashImage>,
     snackBarEvent: Flow<SnackBarEvent>,
+    searchQuery : String,
+    onSearchQueryChange : (String) -> Unit,
     onBackClick : () -> Unit,
+    onSearch : (String) -> Unit,
     onImageClick : (String) -> Unit,
 ){
     val focusRequester = remember { FocusRequester() }
@@ -57,10 +64,13 @@ fun SearchScreen(
 
     var isSuggestionChipsVisible by remember { mutableStateOf(false) }
 
+    Log.d(Constants.IV_LOG_TAG, "searchImagesCount: ${searchImages.itemCount}")
+
     var showImagePreview by remember { mutableStateOf(false) }
     var activeImage by remember { mutableStateOf<UnsplashImage?>(null) }
 
-    var query by remember { mutableStateOf("") }
+//    var query by remember { mutableStateOf("") }
+// move to MainActivity for keep the query values if we move to other screen and back to Search Screen
 
     LaunchedEffect(key1 = true) {
         snackBarEvent.collect{ event ->
@@ -88,9 +98,10 @@ fun SearchScreen(
                     .padding(vertical = 10.dp)
                     .focusRequester(focusRequester)
                     .onFocusChanged { isSuggestionChipsVisible = it.isFocused },
-                query = query,
-                onQueryChange = { query = it},
+                query = searchQuery,
+                onQueryChange = { onSearchQueryChange(it)},
                 onSearch = {
+                    onSearch(searchQuery)
                     keyboardController?.hide()
                     focusManager.clearFocus()
                 },
@@ -106,8 +117,8 @@ fun SearchScreen(
                 trailingIcon = {
                     IconButton(
                         onClick = {
-                            if (query.isNotEmpty()) {
-                                query = ""
+                            if (searchQuery.isNotEmpty()) {
+                                onSearchQueryChange("")
                             }else{
                                 onBackClick()
                             }
@@ -131,7 +142,8 @@ fun SearchScreen(
                     items(searchKeywords){ keyword ->
                         SuggestionChip(
                             onClick = {
-                                query = keyword
+                                onSearch(keyword)
+                                onSearchQueryChange(keyword)
                                 keyboardController?.hide()
                                 focusManager.clearFocus()
                             },
@@ -146,9 +158,8 @@ fun SearchScreen(
                     }
                 }
             }
-
             ImageVerticalGrid(
-                images = emptyList(),
+                images = searchImages,
                 onImageClick = onImageClick,
                 onImageDragStart = { image ->
                     activeImage = image

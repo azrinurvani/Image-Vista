@@ -9,6 +9,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.azrinurvani.imagevista.presentation.favourite.FavouriteScreen
 import com.azrinurvani.imagevista.presentation.full_image_screen.FullImageScreen
 import com.azrinurvani.imagevista.presentation.full_image_screen.FullImageViewModel
@@ -23,7 +24,9 @@ import com.azrinurvani.imagevista.presentation.search_screen.SearchViewModel
 fun NavGraphSetup(
     navController: NavHostController,
     scrollBehavior: TopAppBarScrollBehavior,
-    snackbarHostState: SnackbarHostState
+    snackbarHostState: SnackbarHostState,
+    searchQuery : String,
+    onSearchQueryChange : (String) -> Unit,
 ){
     NavHost(
         navController = navController,
@@ -46,13 +49,18 @@ fun NavGraphSetup(
         }
         composable<Routes.SearchScreen> {
             val searchViewModel : SearchViewModel = hiltViewModel()
+            val searchImages = searchViewModel.searchImages.collectAsLazyPagingItems()
             SearchScreen(
                 snackBarHostState = snackbarHostState,
                 snackBarEvent = searchViewModel.snackBarEvent,
+                searchImages = searchImages,
+                searchQuery = searchQuery,
+                onSearchQueryChange = onSearchQueryChange,
                 onBackClick = { navController.navigateUp() },
                 onImageClick = { imageId ->
                     navController.navigate(Routes.FullImageScreen(imageId))
-                }
+                },
+                onSearch = { searchViewModel.searchImages(it) }
             )
 
         }
