@@ -1,13 +1,14 @@
 package com.azrinurvani.imagevista.data.repository
 
+import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
 import com.azrinurvani.imagevista.data.local.ImageVistaDatabase
 import com.azrinurvani.imagevista.data.mapper.toDomainModel
-import com.azrinurvani.imagevista.data.mapper.toDomainModelList
 import com.azrinurvani.imagevista.data.mapper.toFavouriteImageEntity
+import com.azrinurvani.imagevista.data.paging.EditorialFeedRemoteMediator
 import com.azrinurvani.imagevista.data.paging.SearchPagingSource
 import com.azrinurvani.imagevista.data.remote.UnsplashApiService
 import com.azrinurvani.imagevista.data.util.Constants.ITEMS_PER_PAGE
@@ -22,9 +23,27 @@ class ImageRepositoryImpl(
 ) : ImageRepository {
 
     private val favouriteImagesDao = database.favouriteImagesDao()
+    private val editorialFeedDao = database.editorialFeedDao()
 
-    override suspend fun getEditorialFeedImages(): List<UnsplashImage> {
-        return unsplashApi.getEditorialFeedImages().toDomainModelList()
+    //    override suspend fun getEditorialFeedImages(): List<UnsplashImage> {
+//        return unsplashApi.getEditorialFeedImages().toDomainModelList()
+//    }
+    @OptIn(ExperimentalPagingApi::class)
+    override fun getEditorialFeedImages(): Flow<PagingData<UnsplashImage>> {
+        return Pager(
+            config = PagingConfig(
+                initialLoadSize = 20, //change initialLoadSize to 20 because as defaults initial load size is 3 * pageSize (in this case 3*10 = 30 items)
+                pageSize = ITEMS_PER_PAGE
+            ),
+            remoteMediator = EditorialFeedRemoteMediator(unsplashApi,database),
+            pagingSourceFactory = {
+                editorialFeedDao.getAllEditorialFeedImages()
+            }
+        )
+            .flow
+            .map { pagingData ->
+                pagingData.map { it.toDomainModel() }
+            }
     }
 
 

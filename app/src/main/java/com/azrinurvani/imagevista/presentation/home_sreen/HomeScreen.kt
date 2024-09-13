@@ -20,8 +20,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.paging.compose.LazyPagingItems
 import com.azrinurvani.imagevista.R
 import com.azrinurvani.imagevista.domain.model.UnsplashImage
+import com.azrinurvani.imagevista.presentation.component.ImageVerticalGrid
 import com.azrinurvani.imagevista.presentation.component.ImageVistaTopAppBar
 import com.azrinurvani.imagevista.presentation.component.ZoomedImageCard
 import com.azrinurvani.imagevista.presentation.util.SnackBarEvent
@@ -33,10 +35,13 @@ fun HomeScreen(
     snackBarHostState : SnackbarHostState,
     snackBarEvent: Flow<SnackBarEvent>,
     scrollBehavior: TopAppBarScrollBehavior,
-    images : List<UnsplashImage>,
+    images : LazyPagingItems<UnsplashImage>,
+//    images : List<UnsplashImage>,
+    favouriteImageIds : List<String>,
     onImageClick : (String) -> Unit,
     onSearchClick : () -> Unit,
-    onFABClick : () -> Unit
+    onFABClick : () -> Unit,
+    onToggleFavouriteStatus : (UnsplashImage) -> Unit
 ){
 
     var showImagePreview by remember { mutableStateOf(false) }
@@ -59,6 +64,18 @@ fun HomeScreen(
             ImageVistaTopAppBar(
                 onSearchClick = onSearchClick,
                 scrollBehavior = scrollBehavior
+            )
+
+            ImageVerticalGrid(
+                images = images,
+                favouriteImageIds = favouriteImageIds,
+                onImageClick = onImageClick,
+                onImageDragStart = { image ->
+                    activeImage = image
+                    showImagePreview = true
+                },
+                onImageDragEnd = { showImagePreview = false },
+                onToggleFavouriteStatus = onToggleFavouriteStatus
             )
 
 //            ImageVerticalGrid(
