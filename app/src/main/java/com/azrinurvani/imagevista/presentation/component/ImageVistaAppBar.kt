@@ -43,7 +43,8 @@ fun ImageVistaTopAppBar(
     modifier: Modifier = Modifier,
     scrollBehavior: TopAppBarScrollBehavior,
     title : String = "Image Vista",
-    onSearchClick : () -> Unit = {}
+    onSearchClick : () -> Unit = {},
+    navigationIcon: @Composable () -> Unit = {},
 ){
     CenterAlignedTopAppBar(
         modifier = modifier,
@@ -77,7 +78,8 @@ fun ImageVistaTopAppBar(
         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
             //When scroll down or top we don't want change color and we use this code to handle it
             scrolledContainerColor = MaterialTheme.colorScheme.background
-        )
+        ),
+        navigationIcon = navigationIcon
 
     )
 }

@@ -52,11 +52,13 @@ fun SearchScreen(
     snackBarHostState : SnackbarHostState,
     searchImages : LazyPagingItems<UnsplashImage>,
     snackBarEvent: Flow<SnackBarEvent>,
+    favouriteImageIds : List<String>,
     searchQuery : String,
     onSearchQueryChange : (String) -> Unit,
     onBackClick : () -> Unit,
     onSearch : (String) -> Unit,
     onImageClick : (String) -> Unit,
+    onToggleFavouriteStatus : (UnsplashImage) -> Unit
 ){
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
@@ -160,12 +162,14 @@ fun SearchScreen(
             }
             ImageVerticalGrid(
                 images = searchImages,
+                favouriteImageIds = favouriteImageIds,
                 onImageClick = onImageClick,
                 onImageDragStart = { image ->
                     activeImage = image
                     showImagePreview = true
                 },
-                onImageDragEnd = { showImagePreview = false }
+                onImageDragEnd = { showImagePreview = false },
+                onToggleFavouriteStatus = onToggleFavouriteStatus
             )
 
         }

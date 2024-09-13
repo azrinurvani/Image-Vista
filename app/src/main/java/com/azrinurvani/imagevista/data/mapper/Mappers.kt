@@ -1,5 +1,6 @@
 package com.azrinurvani.imagevista.data.mapper
 
+import com.azrinurvani.imagevista.data.local.entity.FavouriteImageEntity
 import com.azrinurvani.imagevista.data.remote.dto.UnsplashImageDto
 import com.azrinurvani.imagevista.domain.model.UnsplashImage
 
@@ -18,6 +19,39 @@ fun UnsplashImageDto.toDomainModel() : UnsplashImage{
         description = this.description
     )
 }
+
+fun UnsplashImage.toFavouriteImageEntity() : FavouriteImageEntity{
+    return FavouriteImageEntity(
+        id = this.id,
+        imageUrlSmall = this.imageUrlSmall,
+        imageUrlRegular = this.imageUrlRegular,
+        imageUrlRaw = this.imageUrlRaw,
+        photographerName = this.photographerName,
+        photographerUsername = this.photographerUsername,
+        photographerProfileImageUrl = this.photographerProfileImageUrl,
+        photographerProfileLink = this.photographerProfileLink,
+        width = this.width,
+        height = this.height,
+        description = this.description
+    )
+}
+
+fun FavouriteImageEntity.toDomainModel() : UnsplashImage{
+    return UnsplashImage(
+        id = this.id,
+        imageUrlSmall = this.imageUrlSmall,
+        imageUrlRegular = this.imageUrlRegular,
+        imageUrlRaw = this.imageUrlRaw,
+        photographerName = this.photographerName,
+        photographerUsername = this.photographerUsername,
+        photographerProfileImageUrl = this.photographerProfileImageUrl,
+        photographerProfileLink = this.photographerProfileLink,
+        width = this.width,
+        height = this.height,
+        description = this.description
+    )
+}
+
 
 fun List<UnsplashImageDto>.toDomainModelList() : List<UnsplashImage>{
     return this.map { it.toDomainModel() }
